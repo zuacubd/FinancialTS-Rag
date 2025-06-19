@@ -1,4 +1,4 @@
-# FinSeer
+# Financial Time-series Prediction using RAG 
 This directory is code for FinSeer. 
 - The datasets used in our paper are uploaded in [FinSeer_data](https://huggingface.co/datasets/TheFinAI/finseer_data/).
 - Our retriever is uploaded in [FinSeer](https://huggingface.co/TheFinAI/FinSeer).
