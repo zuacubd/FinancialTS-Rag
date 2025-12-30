@@ -18,6 +18,49 @@ python -m pip install -U angle-emb
 pip install transformers==4.33.2  # UAE
 ```
 
+### Downloading the dataset (ElsaShaw/finseer_data)
+Install huggingface hub library and run the following command. Data will be downloaded the huggingface cache directiory. Please move it to your data directory
+
+hf download ElsaShaw/finseer_data --repo-type dataset
+
+
+### Financial Retriever (https://huggingface.co/TheFinAI/FinSeer), Load model directly
+from transformers import AutoTokenizer, AutoModel
+
+tokenizer = AutoTokenizer.from_pretrained("TheFinAI/FinSeer")
+model = AutoModel.from_pretrained("TheFinAI/FinSeer")
+
+
+### StockLLM ( https://huggingface.co/TheFinAI/StockLLM) (RAG for financial data)
+# Load model directly
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+stockLLM_tokenizer = AutoTokenizer.from_pretrained("TheFinAI/StockLLM")
+stockLLM_model = AutoModelForCausalLM.from_pretrained("TheFinAI/StockLLM")
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {"type": "image", "url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/p-blog/candy.JPG"},
+            {"type": "text", "text": "What animal is on the candy?"}
+        ]
+    },
+]
+
+inputs = stockLLM_tokenizer.apply_chat_template(
+	messages,
+	add_generation_prompt=True,
+	tokenize=True,
+	return_dict=True,
+	return_tensors="pt",
+).to(stockLLM_model.device)
+
+
+outputs = stockLLM_model.generate(**inputs, max_new_tokens=40)
+print(stockLLM_tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:]))
+
+
 ### train the retriever
 step 1. get llm feedback scores (src/2_train_retriever/get_llm_feedback_scores.py)
 - dataset: acl18, bigdata22, stock23

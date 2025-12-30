@@ -133,22 +133,17 @@ def get_rise_and_fall_amount(data):
     print(rise_count, fall_count)
 
 
-def get_all_scores(llm_name):
+def get_all_scores(llm):
     """
 	loading LLM model and tokenisers
     """
-    print ("loading LLM model from {}".format(llm_name))
-    llm = data_paths.get_model_dir(llm_name)
+    print ("loading {} model".format(llm))
 
     model = AutoModelForCausalLM.from_pretrained(
         llm,
+        dtype=torch.bfloat16,
         device_map="auto"
     )
-    #model = AutoModelForCausalLM.from_pretrained(
-    #    llm,
-    #    torch_type=torch.bfloat16,
-    #    device_map="auto"
-    #)
     tokenizer = AutoTokenizer.from_pretrained(llm)
     print ("model loaded.")
     
@@ -165,8 +160,7 @@ def get_all_scores(llm_name):
         query_number = datastore.get_query_amount()
         count = 0
         flag = False
-        print ("Total query: {}".format(query_number))
-
+        
         for query_date, query_sequence_list in qlist_by_date.items():
             query_date_dt = datetime.strptime(query_date, format("%Y-%m-%d"))
             
@@ -205,8 +199,7 @@ def get_all_scores(llm_name):
                         print(query_json)
                         flag = True
 
-    output_file_path = data_paths.preprocessed_dir + '/' + args.dataset + '_' + args.split + '_' + args.target
-    with open(output_file_path, "w") as file:
+    with open(os.path.join(data_paths.output_root, args.dataset + '_' + args.split, + '_' + args.target, "w")) as file:
         for obj in query_list:
             # 将JSON对象转换为字符串
             json_str = json.dumps(obj)
@@ -214,17 +207,15 @@ def get_all_scores(llm_name):
             file.write(json_str + "\n")
     return query_list
 
+
 if __name__ == "__main__":
     print ("start running the LLM feedback scorar")
     parser = argparse.ArgumentParser(description='test')
     parser.add_argument('--dataset', default='acl18', type=str)
     parser.add_argument('--split', default='test', type=str)
     parser.add_argument('--target', default='w_movement_acl18.scored.json', type=str)
-    parser.add_argument('--model', default='StockLLM', type=str)
     args = parser.parse_args()
- 
-    #get_all_scores(llm='TheFinAI/StockLLM')  # llama family are all supported for this code    
-    get_all_scores(llm_name=args.model)  # llama family are all supported for this code
-
+    
+    get_all_scores(llm='TheFinAI/StockLLM')  # llama family are all supported for this code
     print ("done for dataset: {} and split: {}".format(args.dataset, args.split))
 

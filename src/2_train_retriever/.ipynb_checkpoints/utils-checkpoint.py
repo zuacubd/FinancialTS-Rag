@@ -14,15 +14,13 @@ import gc
 import subprocess
 import random
 
-#parent_dir = os.path.abspath('..')
-#print ("Hello: ", parent_dir)
-#sys.path.append(parent_dir)
+parent_dir = os.path.abspath('..')
+print ("Hello: ", parent_dir)
+sys.path.append(parent_dir)
 
 #sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append('.') # running from the root directory
-
-from commons import data_paths
-#import data_paths
+#from parent_dir import data_paths
+import data_paths
 
 def load_json_lines(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
